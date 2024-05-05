@@ -51,6 +51,7 @@ import androidx.navigation.compose.rememberNavController
 import org.d3if3068.assesment2.daundiary.R
 import org.d3if3068.assesment2.daundiary.model.DataBuku
 import org.d3if3068.assesment2.daundiary.model.DataDummy
+import org.d3if3068.assesment2.daundiary.navigation.Screen
 import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme
 import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
 
@@ -85,7 +86,7 @@ fun MainScreen(navController: NavHostController) {
             )
         },
         floatingActionButton = {
-            IconButton(onClick = { /*TODO*/ }, Modifier.size(60.dp)) {
+            IconButton(onClick = { navController.navigate(Screen.FormInput.route) }, Modifier.size(60.dp)) {
                 Image(
                     painter = painterResource(id = R.drawable.fab),
                     contentDescription = "fab",
@@ -132,14 +133,14 @@ fun ScreenContent(modifier: Modifier) {
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy((-16).dp, Alignment.End)
                     ) {
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .size(27.dp),
-                                painter = painterResource(id = R.drawable.bookfav),
-                                contentDescription = "buku favorit")
-                        }
+//                        IconButton(onClick = { /*TODO*/ }) {
+//                            Image(
+//                                modifier = Modifier
+//                                    .padding(top = 8.dp)
+//                                    .size(27.dp),
+//                                painter = painterResource(id = R.drawable.bookfav),
+//                                contentDescription = "buku favorit")
+//                        }
                         TextField(
                             shape = RoundedCornerShape(17.dp),
                             leadingIcon = {
@@ -167,18 +168,17 @@ fun ScreenContent(modifier: Modifier) {
                             )
                         )
                     }
-                    LazyVerticalGrid(
-//                        modifier = Modifier.padding(bottom = 100.dp),
-                        columns = GridCells.Fixed(2),
-                        ) {
-                        itemsIndexed(DataDummy.data) {index, item ->
-                            Buku(item)
-                        }
-                        item { 
-                            Spacer(modifier = Modifier.height(50.dp))
-                        }
-                    }
-//                    TampilanDataKosong()
+//                    LazyVerticalGrid(
+//                        columns = GridCells.Fixed(2),
+//                        ) {
+//                        itemsIndexed(DataDummy.data) {index, item ->
+//                            Buku(item)
+//                        }
+//                        item {
+//                            Spacer(modifier = Modifier.height(50.dp))
+//                        }
+//                    }
+                    TampilanDataKosong()
                 }
             }
         }

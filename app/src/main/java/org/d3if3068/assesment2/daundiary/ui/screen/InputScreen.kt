@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,17 +38,24 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import org.d3if3068.assesment2.daundiary.R
 import org.d3if3068.assesment2.daundiary.model.Warna
 import org.d3if3068.assesment2.daundiary.ui.theme.Coklat
@@ -124,7 +132,13 @@ val itemWarna = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputScreen() {
+fun InputScreen(navController: NavHostController) {
+
+    var judul by remember { mutableStateOf("") }
+    var deskripsi by remember { mutableStateOf("") }
+    var pengarang by remember { mutableStateOf("") }
+    var warnaBuku by remember { mutableStateOf(Color.Unspecified) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -142,7 +156,7 @@ fun InputScreen() {
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             modifier = Modifier.size(35.dp),
                             tint = Color.White,
@@ -154,12 +168,28 @@ fun InputScreen() {
             )
         },
     ) { padding ->
-        InputContent(Modifier.padding(padding))
+        InputContent(
+            dataJudul = judul,
+            onTitleChange = { judul = it },
+            dataDeskripsi = deskripsi,
+            onDescChange = {deskripsi = it},
+            dataPengarang = pengarang,
+            onAuthorChange = {pengarang = it},
+            dataWarna = warnaBuku,
+            onColorChange = {warnaBuku = it},
+            modifier = Modifier.padding(padding)
+        )
     }
 }
 
 @Composable
-fun InputContent(modifier: Modifier) {
+fun InputContent(
+    dataJudul: String, onTitleChange: (String) -> Unit,
+    dataDeskripsi: String, onDescChange: (String) -> Unit,
+    dataPengarang: String, onAuthorChange: (String) -> Unit,
+    dataWarna: Color, onColorChange: (Color) -> Unit,
+    modifier: Modifier
+) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -167,7 +197,15 @@ fun InputContent(modifier: Modifier) {
             .padding(24.dp)
             .fillMaxSize()
     ) {
-        BukuInput()
+        BukuInput(
+            dataJudul,
+            onTitleChange,
+            dataDeskripsi,
+            onDescChange,
+            dataPengarang,
+            onAuthorChange,
+            dataWarna
+        )
         Text(
             modifier = Modifier.padding(top = 19.dp, bottom = 4.dp),
             text = "Warna",
@@ -183,9 +221,16 @@ fun InputContent(modifier: Modifier) {
             thickness = 1.dp
         )
         LazyVerticalGrid(
-            columns = GridCells.Fixed(4)) {
-            itemsIndexed(itemWarna) {index, item ->
-                PilihanWarna(item = item)
+            columns = GridCells.Fixed(4)
+        ) {
+            itemWarna.forEach {warnaNya ->
+                item {
+                    PilihanWarna(
+                        warna = warnaNya.warna,
+                        isSelected = dataWarna == warnaNya.warna,
+                        perubahanWarna = { onColorChange(warnaNya.warna) }
+                    )
+                }
             }
         }
         Divider(
@@ -208,15 +253,24 @@ fun InputContent(modifier: Modifier) {
 }
 
 @Composable
-fun BukuInput() {
+fun BukuInput(
+    judul: String,
+    perubahanJudul: (String) -> Unit,
+    deskripsi: String,
+    perubahanDeskrips: (String) -> Unit,
+    pengarang: String,
+    perubahanPengarang: (String) -> Unit,
+    warna: Color,
+) {
     Box(
         modifier = Modifier
             .width(280.dp)
             .offset(x = (-15).dp)
     ) {
-        Image(
-            modifier = Modifier.size(279.dp),
+        Icon(
+            modifier = Modifier.size(320.dp),
             painter = painterResource(id = R.drawable.inputbook),
+            tint = warna,
             contentDescription = "Buku Masukkan"
         )
         Column(
@@ -226,21 +280,19 @@ fun BukuInput() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TextField(
-                value = "Judul",
-                onValueChange = { },
+                value = judul,
+                onValueChange = { perubahanJudul(it) },
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(top = 16.dp)
                     .width(160.dp)
-                    .height(30.dp),
+                    .height(60.dp),
                 textStyle = TextStyle(
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = Color.Black
                 ),
                 placeholder = { Text(text = "Judul") },
-                label = { Text(text = "Judul", color = Color.Gray) },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {}),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
                     focusedContainerColor = Color.White,
@@ -249,21 +301,19 @@ fun BukuInput() {
                 )
             )
             TextField(
-                value = "Deskripsi",
-                onValueChange = { },
+                value = deskripsi,
+                onValueChange = { perubahanDeskrips(it) },
                 modifier = Modifier
                     .padding(16.dp)
                     .width(160.dp)
-                    .height(120.dp),
+                    .height(130.dp),
                 textStyle = TextStyle(
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = Color.Black
                 ),
                 placeholder = { Text(text = "Deskripsi") },
-                label = { Text(text = "Deskripsi", color = Color.Gray) },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {}),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
                     focusedContainerColor = Color.White,
@@ -272,21 +322,19 @@ fun BukuInput() {
                 )
             )
             TextField(
-                value = "Pembuat",
-                onValueChange = { },
+                value = pengarang,
+                onValueChange = { perubahanPengarang(it) },
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(bottom = 16.dp)
                     .width(160.dp)
-                    .height(30.dp),
+                    .height(60.dp),
                 textStyle = TextStyle(
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = Color.Black
                 ),
-                placeholder = { Text(text = "Pembuat") },
-                label = { Text(text = "Pembuat", color = Color.Gray) },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {}),
+                placeholder = { Text(text = "pengarang") },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
                     focusedContainerColor = Color.White,
@@ -302,6 +350,6 @@ fun BukuInput() {
 @Composable
 fun InputPrev() {
     DaunDiaryTheme {
-        InputScreen()
+        InputScreen(rememberNavController())
     }
 }
