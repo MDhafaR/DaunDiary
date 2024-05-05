@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,6 +46,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import org.d3if3068.assesment2.daundiary.R
 import org.d3if3068.assesment2.daundiary.model.DataBuku
 import org.d3if3068.assesment2.daundiary.model.DataDummy
@@ -55,7 +56,7 @@ import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -105,7 +106,7 @@ fun ScreenContent(modifier: Modifier) {
         Image(
             modifier = Modifier
                 .size(400.dp)
-                .offset(y = -75.dp),
+                .offset(y = (-75).dp),
             painter = painterResource(id = R.drawable.lightback),
             contentDescription = "Pagi"
         )
@@ -129,7 +130,7 @@ fun ScreenContent(modifier: Modifier) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(-16.dp, Alignment.End)
+                        horizontalArrangement = Arrangement.spacedBy((-16).dp, Alignment.End)
                     ) {
                         IconButton(onClick = { /*TODO*/ }) {
                             Image(
@@ -274,6 +275,6 @@ fun Buku(dataBuku: DataBuku) {
 @Composable
 fun MainPrev() {
     DaunDiaryTheme {
-        MainScreen()
+        MainScreen(rememberNavController())
     }
 }
