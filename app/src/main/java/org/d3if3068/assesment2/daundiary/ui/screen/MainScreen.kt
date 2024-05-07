@@ -53,18 +53,26 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.d3if3068.assesment2.daundiary.R
 import org.d3if3068.assesment2.daundiary.database.BukuDb
 import org.d3if3068.assesment2.daundiary.model.DataBuku
 import org.d3if3068.assesment2.daundiary.model.MainViewModel
 import org.d3if3068.assesment2.daundiary.navigation.Screen
+import org.d3if3068.assesment2.daundiary.ui.theme.DarkPrimary
 import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme
 import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
+import org.d3if3068.assesment2.daundiary.util.SettingsDataStore
 import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
+    val dataStore = SettingsDataStore(LocalContext.current)
+    val isLight by dataStore.layoutFlow.collectAsState(initial = true)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -78,16 +86,26 @@ fun MainScreen(navController: NavHostController) {
                     )
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = LightPrimary,
+                    containerColor = if (isLight) LightPrimary else DarkPrimary,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            dataStore.saveLayout(!isLight)
+                        }
+                    }) {
                         Icon(
                             modifier = Modifier.size(26.dp),
+                            painter = painterResource(
+                                if (isLight) R.drawable.moon
+                                else R.drawable.sun
+                            ),
+                            contentDescription = stringResource(
+                                if (isLight) R.string.morning
+                                else R.string.night
+                            ),
                             tint = Color.White,
-                            painter = painterResource(id = R.drawable.moon),
-                            contentDescription = "bulan"
                         )
                     }
                 }
@@ -98,20 +116,21 @@ fun MainScreen(navController: NavHostController) {
                 onClick = { navController.navigate(Screen.FormInput.route) },
                 Modifier.size(60.dp)
             ) {
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.fab),
+                    tint = if (isLight) LightPrimary else DarkPrimary,
                     contentDescription = "fab",
-                    Modifier.size(50.dp)
+                    modifier = Modifier.size(50.dp)
                 )
             }
         }
     ) { padding ->
-        ScreenContent(Modifier.padding(padding), navController)
+        ScreenContent(isLight, Modifier.padding(padding), navController)
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier, navController: NavHostController) {
+fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostController) {
 
     val context = LocalContext.current
     val db = BukuDb.getInstance(context)
@@ -123,10 +142,16 @@ fun ScreenContent(modifier: Modifier, navController: NavHostController) {
         modifier = modifier
     ) {
         Image(
-            modifier = Modifier
-                .size(400.dp)
-                .offset(y = (-75).dp),
-            painter = painterResource(id = R.drawable.lightback),
+            modifier = if (isLight) Modifier
+                .size(415.dp)
+                .offset(y = (-76).dp)
+            else
+                Modifier
+                    .size(415.dp)
+                    .offset(y = (-45).dp),
+            painter = if (isLight)
+                painterResource(id = R.drawable.lightback)
+            else painterResource(id = R.drawable.darkback),
             contentDescription = "Pagi"
         )
         LazyColumn {

@@ -16,16 +16,16 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 class SettingsDataStore(private val context: Context) {
 
     companion object {
-        private val IS_LIST = booleanPreferencesKey("is_list")
+        private val IS_MORNING = booleanPreferencesKey("is_morning")
     }
 
     val layoutFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
-        preferences[IS_LIST] ?: true
+        preferences[IS_MORNING] ?: true
     }
 
-    suspend fun saveLayout(isiList: Boolean) {
+    suspend fun saveLayout(isMorning: Boolean) {
         context.dataStore.edit { preferences ->
-            preferences[IS_LIST] = isiList
+            preferences[IS_MORNING] = isMorning
         }
     }
 }

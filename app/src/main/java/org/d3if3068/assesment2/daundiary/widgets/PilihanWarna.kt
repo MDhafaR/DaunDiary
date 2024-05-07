@@ -37,8 +37,8 @@ fun PilihanWarna(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .border(
-                1.dp,
-                if (isSelected) Color.Cyan else Color.Transparent,
+                2.dp,
+                if (isSelected) Color.Green else Color.Transparent,
                 RoundedCornerShape(17.dp)
             )
             .width(74.dp)

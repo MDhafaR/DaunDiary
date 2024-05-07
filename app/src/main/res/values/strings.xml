@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DaunDiary</string>
+    <string name="morning">Tampilan Pagi</string>
+    <string name="night">Tampilan Malam</string>
 </resources>

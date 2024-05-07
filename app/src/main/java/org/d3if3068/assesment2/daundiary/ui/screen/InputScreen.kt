@@ -35,6 +35,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,12 +60,15 @@ import org.d3if3068.assesment2.daundiary.database.BukuDb
 import org.d3if3068.assesment2.daundiary.model.InputViewModel
 import org.d3if3068.assesment2.daundiary.model.Warna
 import org.d3if3068.assesment2.daundiary.ui.theme.Coklat
+import org.d3if3068.assesment2.daundiary.ui.theme.CoklatTua
+import org.d3if3068.assesment2.daundiary.ui.theme.DarkPrimary
 import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme
 import org.d3if3068.assesment2.daundiary.ui.theme.HijauTua
 import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
 import org.d3if3068.assesment2.daundiary.ui.theme.MerahMuda
 import org.d3if3068.assesment2.daundiary.ui.theme.Orange
 import org.d3if3068.assesment2.daundiary.ui.theme.PinkMuda
+import org.d3if3068.assesment2.daundiary.util.SettingsDataStore
 import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
 import org.d3if3068.assesment2.daundiary.widgets.KonfirmasiHapus
 import org.d3if3068.assesment2.daundiary.widgets.PilihanWarna
@@ -81,9 +85,9 @@ val itemWarna = listOf(
         warna = Color.Red
     ),
     Warna(
-        nama = "hijau",
+        nama = "coklat tua",
         isSelected = false,
-        warna = Color.Green
+        warna = CoklatTua
     ),
     Warna(
         nama = "abu abu",
@@ -137,6 +141,9 @@ const val KEY_ID_BUKU = "idBuku"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputScreen(navController: NavHostController, id: Int? = null) {
+    val dataStore = SettingsDataStore(LocalContext.current)
+    val isLight by dataStore.layoutFlow.collectAsState(initial = true)
+
     val context = LocalContext.current
     val db = BukuDb.getInstance(context)
     val factory = ViewModelFactory(db.dao)
@@ -173,7 +180,7 @@ fun InputScreen(navController: NavHostController, id: Int? = null) {
                     )
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = LightPrimary,
+                    containerColor = if (isLight) LightPrimary else DarkPrimary,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
                 navigationIcon = {
@@ -216,7 +223,8 @@ fun InputScreen(navController: NavHostController, id: Int? = null) {
             contextnya = context,
             idNya = id,
             viewModel = viewModel,
-            navController = navController
+            navController = navController,
+            isLight
         )
     }
 }
@@ -231,7 +239,8 @@ fun InputContent(
     contextnya: Context,
     idNya: Int?,
     viewModel: InputViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    isLight: Boolean
 ) {
 
     Column(
@@ -254,13 +263,13 @@ fun InputContent(
             text = "Warna",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = LightPrimary
+            color = if (isLight) LightPrimary else DarkPrimary
         )
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 13.dp),
-            color = LightPrimary,
+            color = if (isLight) LightPrimary else DarkPrimary,
             thickness = 1.dp
         )
         LazyVerticalGrid(
@@ -280,7 +289,7 @@ fun InputContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 13.dp),
-            color = LightPrimary,
+            color = if (isLight) LightPrimary else DarkPrimary,
             thickness = 1.dp
         )
         Button(
@@ -300,7 +309,7 @@ fun InputContent(
                 }
                 navController.popBackStack()
             },
-            colors = ButtonDefaults.buttonColors(LightPrimary)
+            colors = ButtonDefaults.buttonColors(if (isLight) LightPrimary else DarkPrimary)
         ) {
             Text(text = "Simpan", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
