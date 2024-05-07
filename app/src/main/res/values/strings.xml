@@ -2,4 +2,21 @@
     <string name="app_name">DaunDiary</string>
     <string name="morning">Tampilan Pagi</string>
     <string name="night">Tampilan Malam</string>
+    <string name="kembali">Kembali</string>
+    <string name="warna">Warna</string>
+    <string name="simpan">Simpan</string>
+    <string name="buku_masukkan">Buku Masukkan</string>
+    <string name="judul">Judul</string>
+    <string name="deskripsi">Deskripsi</string>
+    <string name="pengarang">pengarang</string>
+    <string name="lainnya">Lainnya</string>
+    <string name="hapus">Hapus</string>
+    <string name="fab">FAB</string>
+    <string name="pagi">Pagi</string>
+    <string name="malam">Malam</string>
+    <string name="search">Search</string>
+    <string name="empty_data">Empty Data</string>
+    <string name="buat_diarymu">Buat DiaryMu</string>
+    <string name="konfirmasi_teks">Apakah anda yakin ingin menghapus data ini?</string>
+    <string name="batal">Batal</string>
 </resources>

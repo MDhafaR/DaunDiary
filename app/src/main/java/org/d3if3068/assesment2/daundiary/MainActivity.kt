@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import org.d3if3068.assesment2.daundiary.model.MainViewModel
 import org.d3if3068.assesment2.daundiary.navigation.SetupNavGraph
 import org.d3if3068.assesment2.daundiary.ui.screen.MainScreen
 import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme

@@ -189,7 +189,7 @@ fun InputScreen(navController: NavHostController, id: Int? = null) {
                             modifier = Modifier.size(35.dp),
                             tint = Color.White,
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Kembali"
+                            contentDescription = stringResource(R.string.kembali)
                         )
                     }
                 },
@@ -260,7 +260,7 @@ fun InputContent(
         )
         Text(
             modifier = Modifier.padding(top = 19.dp, bottom = 4.dp),
-            text = "Warna",
+            text = stringResource(R.string.warna),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = if (isLight) LightPrimary else DarkPrimary
@@ -311,7 +311,7 @@ fun InputContent(
             },
             colors = ButtonDefaults.buttonColors(if (isLight) LightPrimary else DarkPrimary)
         ) {
-            Text(text = "Simpan", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.simpan), fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -335,7 +335,7 @@ fun BukuInput(
             modifier = Modifier.size(320.dp),
             painter = painterResource(id = R.drawable.inputbook),
             tint = warna,
-            contentDescription = "Buku Masukkan"
+            contentDescription = stringResource(R.string.buku_masukkan)
         )
         Column(
             modifier = Modifier
@@ -355,7 +355,7 @@ fun BukuInput(
                     fontWeight = FontWeight.Medium,
                     color = Color.Black
                 ),
-                placeholder = { Text(text = "Judul") },
+                placeholder = { Text(text = stringResource(R.string.judul)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
@@ -376,7 +376,7 @@ fun BukuInput(
                     fontWeight = FontWeight.Medium,
                     color = Color.Black
                 ),
-                placeholder = { Text(text = "Deskripsi") },
+                placeholder = { Text(text = stringResource(R.string.deskripsi)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
@@ -397,7 +397,7 @@ fun BukuInput(
                     fontWeight = FontWeight.Medium,
                     color = Color.Black
                 ),
-                placeholder = { Text(text = "pengarang") },
+                placeholder = { Text(text = stringResource(R.string.pengarang)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
@@ -419,7 +419,7 @@ fun MenuDelete(delete: () -> Unit) {
     IconButton(onClick = { expended = true }) {
         Icon(
             imageVector = Icons.Filled.MoreVert,
-            contentDescription = "Lainnya",
+            contentDescription = stringResource(R.string.lainnya),
             tint = Color.White
         )
         DropdownMenu(
@@ -427,7 +427,7 @@ fun MenuDelete(delete: () -> Unit) {
             onDismissRequest = { expended = false })
         {
             DropdownMenuItem(
-                text = { Text(text = "Hapus") },
+                text = { Text(text = stringResource(R.string.hapus)) },
                 onClick = {
                     expended = false
                     delete()

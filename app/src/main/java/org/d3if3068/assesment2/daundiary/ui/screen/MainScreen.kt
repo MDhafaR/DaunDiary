@@ -1,5 +1,6 @@
 package org.d3if3068.assesment2.daundiary.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,12 +48,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,8 +60,8 @@ import org.d3if3068.assesment2.daundiary.database.BukuDb
 import org.d3if3068.assesment2.daundiary.model.DataBuku
 import org.d3if3068.assesment2.daundiary.model.MainViewModel
 import org.d3if3068.assesment2.daundiary.navigation.Screen
+import org.d3if3068.assesment2.daundiary.ui.theme.AbuAbu
 import org.d3if3068.assesment2.daundiary.ui.theme.DarkPrimary
-import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme
 import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
 import org.d3if3068.assesment2.daundiary.util.SettingsDataStore
 import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
@@ -119,7 +118,7 @@ fun MainScreen(navController: NavHostController) {
                 Icon(
                     painter = painterResource(id = R.drawable.fab),
                     tint = if (isLight) LightPrimary else DarkPrimary,
-                    contentDescription = "fab",
+                    contentDescription = stringResource(R.string.fab),
                     modifier = Modifier.size(50.dp)
                 )
             }
@@ -129,14 +128,18 @@ fun MainScreen(navController: NavHostController) {
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostController) {
+
 
     val context = LocalContext.current
     val db = BukuDb.getInstance(context)
     val factory = ViewModelFactory(db.dao)
     val viewModel: MainViewModel = viewModel(factory = factory)
     val data by viewModel.data.collectAsState()
+
+    val searchQuery = viewModel.searchQuery.collectAsState().value
 
     Box(
         modifier = modifier
@@ -152,7 +155,7 @@ fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostCo
             painter = if (isLight)
                 painterResource(id = R.drawable.lightback)
             else painterResource(id = R.drawable.darkback),
-            contentDescription = "Pagi"
+            contentDescription = if (isLight) stringResource(R.string.pagi) else stringResource(R.string.malam)
         )
         LazyColumn {
             item {
@@ -191,25 +194,30 @@ fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostCo
                                     modifier = Modifier
                                         .size(20.dp),
                                     painter = painterResource(id = R.drawable.search),
-                                    contentDescription = "buku favorit"
+                                    contentDescription = stringResource(R.string.search)
                                 )
                             },
-                            value = "Search",
-                            onValueChange = { },
+                            value = searchQuery,
+                            onValueChange = {
+                                viewModel.setSearchQuery(it)
+                            },
                             modifier = Modifier
-                                .padding(16.dp)
-                                .width(143.dp)
-                                .height(23.dp),
+                                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
+                                .fillMaxWidth()
+                                .height(49.dp),
                             textStyle = TextStyle(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = Color.White
                             ),
-                            placeholder = { Text(text = "Search") },
-                            label = { Text(text = "Search", color = Color.White) },
+                            placeholder = { Text(text = stringResource(R.string.search), color = Color.White) },
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                            keyboardActions = KeyboardActions(onSearch = {}),
+                            keyboardActions = KeyboardActions(onSearch = {
+                                viewModel.setSearchQuery(searchQuery)
+                            }),
                             colors = TextFieldDefaults.colors(
+                                focusedContainerColor = AbuAbu,
+                                unfocusedContainerColor = AbuAbu,
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent
                             )
@@ -221,13 +229,22 @@ fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostCo
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2),
                         ) {
-                            itemsIndexed(data) { index, item ->
+                            item {
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                            itemsIndexed(data) { _, item ->
                                 Buku(item) {
                                     navController.navigate(Screen.FormUbah.withId(item.id))
                                 }
                             }
                             item {
-                                Spacer(modifier = Modifier.height(50.dp))
+                                Spacer(modifier = Modifier.height(55.dp))
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(55.dp))
                             }
                         }
                     }
@@ -249,13 +266,13 @@ fun TampilanDataKosong() {
             modifier = Modifier
                 .size(163.dp),
             painter = painterResource(id = R.drawable.emptyimage),
-            contentDescription = "Empty Data"
+            contentDescription = stringResource(R.string.empty_data)
         )
         Text(
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             color = LightPrimary,
-            text = "Buat DiaryMu",
+            text = stringResource(R.string.buat_diarymu),
         )
     }
 }
@@ -272,7 +289,7 @@ fun Buku(dataBuku: DataBuku, onClick: () -> Unit) {
             tint = Color(dataBuku.warnaBuku),
             modifier = Modifier.size(279.dp),
             painter = painterResource(id = R.drawable.inputbook),
-            contentDescription = "Buku Masukkan"
+            contentDescription = stringResource(R.string.buku_masukkan)
         )
         Column(
             modifier = Modifier
@@ -326,10 +343,10 @@ fun Buku(dataBuku: DataBuku, onClick: () -> Unit) {
 //    }
 //}
 
-@Preview(showBackground = true)
-@Composable
-fun MainPrev() {
-    DaunDiaryTheme {
-        MainScreen(rememberNavController())
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun MainPrev() {
+//    DaunDiaryTheme {
+//        MainScreen(rememberNavController())
+//    }
+//}

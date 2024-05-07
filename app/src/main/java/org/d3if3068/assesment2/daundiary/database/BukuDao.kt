@@ -23,4 +23,7 @@ interface BukuDao {
 
     @Query("DELETE FROM book WHERE id = :id")
     suspend fun deleteById(id: Int)
+
+    @Query("SELECT * FROM book WHERE judul LIKE '%' || :searchQuery || '%' ORDER BY judul ASC")
+    fun searchBooksByTitle(searchQuery: String): Flow<List<DataBuku>>
 }

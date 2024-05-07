@@ -1,10 +1,7 @@
 package org.d3if3068.assesment2.daundiary.model
 
-import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.d3if3068.assesment2.daundiary.ui.theme.MerahMuda
-import org.d3if3068.assesment2.daundiary.ui.theme.Orange
 
 @Entity(tableName = "book")
 data class DataBuku(
