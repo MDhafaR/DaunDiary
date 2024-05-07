@@ -1,7 +1,8 @@
 package org.d3if3068.assesment2.daundiary.ui.screen
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,21 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,9 +32,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,18 +42,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.d3if3068.assesment2.daundiary.R
+import org.d3if3068.assesment2.daundiary.database.BukuDb
+import org.d3if3068.assesment2.daundiary.model.InputViewModel
 import org.d3if3068.assesment2.daundiary.model.Warna
 import org.d3if3068.assesment2.daundiary.ui.theme.Coklat
 import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme
@@ -65,6 +65,8 @@ import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
 import org.d3if3068.assesment2.daundiary.ui.theme.MerahMuda
 import org.d3if3068.assesment2.daundiary.ui.theme.Orange
 import org.d3if3068.assesment2.daundiary.ui.theme.PinkMuda
+import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
+import org.d3if3068.assesment2.daundiary.widgets.KonfirmasiHapus
 import org.d3if3068.assesment2.daundiary.widgets.PilihanWarna
 
 val itemWarna = listOf(
@@ -130,14 +132,33 @@ val itemWarna = listOf(
     ),
 )
 
+const val KEY_ID_BUKU = "idBuku"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputScreen(navController: NavHostController) {
+fun InputScreen(navController: NavHostController, id: Int? = null) {
+    val context = LocalContext.current
+    val db = BukuDb.getInstance(context)
+    val factory = ViewModelFactory(db.dao)
+    val viewModel: InputViewModel = viewModel(factory = factory)
 
     var judul by remember { mutableStateOf("") }
     var deskripsi by remember { mutableStateOf("") }
     var pengarang by remember { mutableStateOf("") }
     var warnaBuku by remember { mutableStateOf(Color.Unspecified) }
+
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(true) {
+        if (id == null) return@LaunchedEffect
+        val data = viewModel.getBook(id) ?: return@LaunchedEffect
+        judul = data.judul
+        deskripsi = data.deskripsi
+        pengarang = data.pengarang
+        warnaBuku = Color(data.warnaBuku)
+    }
 
     Scaffold(
         topBar = {
@@ -164,6 +185,20 @@ fun InputScreen(navController: NavHostController) {
                             contentDescription = "Kembali"
                         )
                     }
+                },
+                actions = {
+                    if (id != null) {
+                        MenuDelete {
+                            showDialog = true
+                        }
+                        KonfirmasiHapus(
+                            openDialog = showDialog,
+                            onDismissRequest = { showDialog = false }) {
+                            showDialog = false
+                            viewModel.delete(id)
+                            navController.popBackStack()
+                        }
+                    }
                 }
             )
         },
@@ -172,12 +207,16 @@ fun InputScreen(navController: NavHostController) {
             dataJudul = judul,
             onTitleChange = { judul = it },
             dataDeskripsi = deskripsi,
-            onDescChange = {deskripsi = it},
+            onDescChange = { deskripsi = it },
             dataPengarang = pengarang,
-            onAuthorChange = {pengarang = it},
+            onAuthorChange = { pengarang = it },
             dataWarna = warnaBuku,
-            onColorChange = {warnaBuku = it},
-            modifier = Modifier.padding(padding)
+            onColorChange = { warnaBuku = it },
+            modifier = Modifier.padding(padding),
+            contextnya = context,
+            idNya = id,
+            viewModel = viewModel,
+            navController = navController
         )
     }
 }
@@ -188,7 +227,11 @@ fun InputContent(
     dataDeskripsi: String, onDescChange: (String) -> Unit,
     dataPengarang: String, onAuthorChange: (String) -> Unit,
     dataWarna: Color, onColorChange: (Color) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    contextnya: Context,
+    idNya: Int?,
+    viewModel: InputViewModel,
+    navController: NavHostController
 ) {
 
     Column(
@@ -223,7 +266,7 @@ fun InputContent(
         LazyVerticalGrid(
             columns = GridCells.Fixed(4)
         ) {
-            itemWarna.forEach {warnaNya ->
+            itemWarna.forEach { warnaNya ->
                 item {
                     PilihanWarna(
                         warna = warnaNya.warna,
@@ -244,7 +287,19 @@ fun InputContent(
             modifier = Modifier
                 .padding(top = 13.dp)
                 .width(267.dp),
-            onClick = { /*TODO*/ },
+            onClick = {
+                if (dataJudul == "" || dataDeskripsi == "" || dataPengarang == "" || dataWarna.hashCode() == 16) {
+                    Toast.makeText(contextnya, "Invalid", Toast.LENGTH_LONG).show()
+                    return@Button
+                }
+
+                if (idNya == null) {
+                    viewModel.insert(dataJudul, dataDeskripsi, dataPengarang, dataWarna)
+                } else {
+                    viewModel.update(idNya, dataJudul, dataDeskripsi, dataPengarang, dataWarna)
+                }
+                navController.popBackStack()
+            },
             colors = ButtonDefaults.buttonColors(LightPrimary)
         ) {
             Text(text = "Simpan", fontSize = 24.sp, fontWeight = FontWeight.Bold)
@@ -342,6 +397,32 @@ fun BukuInput(
                     unfocusedIndicatorColor = Color.Transparent
                 )
             )
+        }
+    }
+}
+
+@Composable
+fun MenuDelete(delete: () -> Unit) {
+    var expended by remember {
+        mutableStateOf(false)
+    }
+
+    IconButton(onClick = { expended = true }) {
+        Icon(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = "Lainnya",
+            tint = Color.White
+        )
+        DropdownMenu(
+            expanded = expended,
+            onDismissRequest = { expended = false })
+        {
+            DropdownMenuItem(
+                text = { Text(text = "Hapus") },
+                onClick = {
+                    expended = false
+                    delete()
+                })
         }
     }
 }

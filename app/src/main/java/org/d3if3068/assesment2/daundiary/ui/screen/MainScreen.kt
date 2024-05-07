@@ -2,6 +2,7 @@ package org.d3if3068.assesment2.daundiary.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,10 +33,13 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -46,14 +50,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.d3if3068.assesment2.daundiary.R
+import org.d3if3068.assesment2.daundiary.database.BukuDb
 import org.d3if3068.assesment2.daundiary.model.DataBuku
-import org.d3if3068.assesment2.daundiary.model.DataDummy
+import org.d3if3068.assesment2.daundiary.model.MainViewModel
 import org.d3if3068.assesment2.daundiary.navigation.Screen
 import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme
 import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
+import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,13 +87,17 @@ fun MainScreen(navController: NavHostController) {
                             modifier = Modifier.size(26.dp),
                             tint = Color.White,
                             painter = painterResource(id = R.drawable.moon),
-                            contentDescription = "bulan")
+                            contentDescription = "bulan"
+                        )
                     }
                 }
             )
         },
         floatingActionButton = {
-            IconButton(onClick = { navController.navigate(Screen.FormInput.route) }, Modifier.size(60.dp)) {
+            IconButton(
+                onClick = { navController.navigate(Screen.FormInput.route) },
+                Modifier.size(60.dp)
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.fab),
                     contentDescription = "fab",
@@ -95,12 +106,19 @@ fun MainScreen(navController: NavHostController) {
             }
         }
     ) { padding ->
-        ScreenContent(Modifier.padding(padding))
+        ScreenContent(Modifier.padding(padding), navController)
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier) {
+fun ScreenContent(modifier: Modifier, navController: NavHostController) {
+
+    val context = LocalContext.current
+    val db = BukuDb.getInstance(context)
+    val factory = ViewModelFactory(db.dao)
+    val viewModel: MainViewModel = viewModel(factory = factory)
+    val data by viewModel.data.collectAsState()
+
     Box(
         modifier = modifier
     ) {
@@ -157,9 +175,13 @@ fun ScreenContent(modifier: Modifier) {
                                 .padding(16.dp)
                                 .width(143.dp)
                                 .height(23.dp),
-                            textStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White),
+                            textStyle = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.White
+                            ),
                             placeholder = { Text(text = "Search") },
-                            label = {Text(text = "Search", color = Color.White)},
+                            label = { Text(text = "Search", color = Color.White) },
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                             keyboardActions = KeyboardActions(onSearch = {}),
                             colors = TextFieldDefaults.colors(
@@ -168,17 +190,22 @@ fun ScreenContent(modifier: Modifier) {
                             )
                         )
                     }
-//                    LazyVerticalGrid(
-//                        columns = GridCells.Fixed(2),
-//                        ) {
-//                        itemsIndexed(DataDummy.data) {index, item ->
-//                            Buku(item)
-//                        }
-//                        item {
-//                            Spacer(modifier = Modifier.height(50.dp))
-//                        }
-//                    }
-                    TampilanDataKosong()
+                    if (data.isEmpty()) {
+                        TampilanDataKosong()
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                        ) {
+                            itemsIndexed(data) { index, item ->
+                                Buku(item) {
+                                    navController.navigate(Screen.FormUbah.withId(item.id))
+                                }
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(50.dp))
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -209,7 +236,7 @@ fun TampilanDataKosong() {
 }
 
 @Composable
-fun Buku(dataBuku: DataBuku) {
+fun Buku(dataBuku: DataBuku, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(bottom = 40.dp)
@@ -217,7 +244,7 @@ fun Buku(dataBuku: DataBuku) {
             .height(175.dp)
     ) {
         Icon(
-            tint = dataBuku.warnaBuku,
+            tint = Color(dataBuku.warnaBuku),
             modifier = Modifier.size(279.dp),
             painter = painterResource(id = R.drawable.inputbook),
             contentDescription = "Buku Masukkan"
@@ -225,6 +252,7 @@ fun Buku(dataBuku: DataBuku) {
         Column(
             modifier = Modifier
                 .offset(x = 40.dp)
+                .clickable { onClick() }
                 .width(135.dp)
                 .height(175.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -236,7 +264,9 @@ fun Buku(dataBuku: DataBuku) {
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 modifier = Modifier
