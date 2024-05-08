@@ -242,6 +242,8 @@ fun InputContent(
     navController: NavHostController,
     isLight: Boolean
 ) {
+    val tanggalBuat : Long = System.currentTimeMillis()
+    val tanggalEdit : Long = System.currentTimeMillis()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -303,9 +305,9 @@ fun InputContent(
                 }
 
                 if (idNya == null) {
-                    viewModel.insert(dataJudul, dataDeskripsi, dataPengarang, dataWarna)
+                    viewModel.insert(dataJudul, dataDeskripsi, dataPengarang, dataWarna, tanggalBuat, tanggalEdit)
                 } else {
-                    viewModel.update(idNya, dataJudul, dataDeskripsi, dataPengarang, dataWarna)
+                    viewModel.update(idNya, dataJudul, dataDeskripsi, dataPengarang, dataWarna, tanggalBuat, tanggalEdit)
                 }
                 navController.popBackStack()
             },

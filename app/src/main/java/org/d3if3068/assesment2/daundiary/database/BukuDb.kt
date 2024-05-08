@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import org.d3if3068.assesment2.daundiary.model.DataBuku
 
-@Database(entities = [DataBuku::class], version = 1, exportSchema = false)
+@Database(entities = [DataBuku::class], version = 2, exportSchema = false)
 abstract class BukuDb : RoomDatabase() {
 
     abstract val dao: BukuDao
@@ -25,7 +25,9 @@ abstract class BukuDb : RoomDatabase() {
                         context.applicationContext,
                         BukuDb::class.java,
                         "book.db"
-                    ).build()
+                    )
+                        .fallbackToDestructiveMigration()
+                        .build()
                     INSTANCE = instance
                 }
                 return instance

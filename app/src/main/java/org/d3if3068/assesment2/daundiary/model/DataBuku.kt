@@ -10,7 +10,9 @@ data class DataBuku(
     val judul: String,
     val deskripsi: String,
     val pengarang: String,
-    val warnaBuku: Int
+    val warnaBuku: Int,
+    val tanggalBuat: Long,
+    val tanggalDiUbah: Long,
 )
 
 //object DataDummy {
