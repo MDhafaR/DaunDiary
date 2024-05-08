@@ -48,10 +48,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -62,6 +64,7 @@ import org.d3if3068.assesment2.daundiary.model.MainViewModel
 import org.d3if3068.assesment2.daundiary.navigation.Screen
 import org.d3if3068.assesment2.daundiary.ui.theme.AbuAbu
 import org.d3if3068.assesment2.daundiary.ui.theme.DarkPrimary
+import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme
 import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
 import org.d3if3068.assesment2.daundiary.util.SettingsDataStore
 import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
@@ -88,26 +91,26 @@ fun MainScreen(navController: NavHostController) {
                     containerColor = if (isLight) LightPrimary else DarkPrimary,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
-                actions = {
-                    IconButton(onClick = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            dataStore.saveLayout(!isLight)
-                        }
-                    }) {
-                        Icon(
-                            modifier = Modifier.size(26.dp),
-                            painter = painterResource(
-                                if (isLight) R.drawable.moon
-                                else R.drawable.sun
-                            ),
-                            contentDescription = stringResource(
-                                if (isLight) R.string.morning
-                                else R.string.night
-                            ),
-                            tint = Color.White,
-                        )
-                    }
-                }
+//                actions = {
+//                    IconButton(onClick = {
+//                        CoroutineScope(Dispatchers.IO).launch {
+//                            dataStore.saveLayout(!isLight)
+//                        }
+//                    }) {
+//                        Icon(
+//                            modifier = Modifier.size(26.dp),
+//                            painter = painterResource(
+//                                if (isLight) R.drawable.moon
+//                                else R.drawable.sun
+//                            ),
+//                            contentDescription = stringResource(
+//                                if (isLight) R.string.morning
+//                                else R.string.night
+//                            ),
+//                            tint = Color.White,
+//                        )
+//                    }
+//                }
             )
         },
         floatingActionButton = {
@@ -124,14 +127,18 @@ fun MainScreen(navController: NavHostController) {
             }
         }
     ) { padding ->
-        ScreenContent(isLight, Modifier.padding(padding), navController)
+        ScreenContent(dataStore, isLight, Modifier.padding(padding), navController)
     }
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostController) {
-
+fun ScreenContent(
+    dataStore: SettingsDataStore,
+    isLight: Boolean,
+    modifier: Modifier,
+    navController: NavHostController
+) {
 
     val context = LocalContext.current
     val db = BukuDb.getInstance(context)
@@ -146,16 +153,18 @@ fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostCo
     ) {
         Image(
             modifier = if (isLight) Modifier
-                .size(415.dp)
-                .offset(y = (-76).dp)
+                .size(430.dp)
+                .offset(y = (-100).dp)
             else
                 Modifier
-                    .size(415.dp)
-                    .offset(y = (-45).dp),
+                    .size(430.dp)
+                    .offset(y = (-50).dp),
             painter = if (isLight)
-                painterResource(id = R.drawable.lightback)
-            else painterResource(id = R.drawable.darkback),
-            contentDescription = if (isLight) stringResource(R.string.pagi) else stringResource(R.string.malam)
+                painterResource(id = R.drawable.lightback_noicon)
+            else painterResource(id = R.drawable.nighback_noicon),
+            contentDescription = if (isLight) stringResource(R.string.pagi) else stringResource(
+                R.string.malam
+            )
         )
         LazyColumn {
             item {
@@ -179,14 +188,19 @@ fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostCo
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy((-16).dp, Alignment.End)
                     ) {
-//                        IconButton(onClick = { /*TODO*/ }) {
-//                            Image(
-//                                modifier = Modifier
-//                                    .padding(top = 8.dp)
-//                                    .size(27.dp),
-//                                painter = painterResource(id = R.drawable.bookfav),
-//                                contentDescription = "buku favorit")
-//                        }
+                        IconButton(
+                            modifier = Modifier
+                                .padding(top = 23.dp, start = 8.dp, end = 8.dp)
+                                .size(40.dp),
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(30.dp),
+                                painter = painterResource(id = R.drawable.bookfav),
+                                contentDescription = "buku favorit"
+                            )
+                        }
                         TextField(
                             shape = RoundedCornerShape(17.dp),
                             leadingIcon = {
@@ -210,7 +224,12 @@ fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostCo
                                 fontWeight = FontWeight.Medium,
                                 color = Color.White
                             ),
-                            placeholder = { Text(text = stringResource(R.string.search), color = Color.White) },
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.search),
+                                    color = Color.White
+                                )
+                            },
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                             keyboardActions = KeyboardActions(onSearch = {
                                 viewModel.setSearchQuery(searchQuery)
@@ -251,6 +270,19 @@ fun ScreenContent(isLight: Boolean, modifier: Modifier, navController: NavHostCo
                 }
             }
         }
+        Image(
+            modifier = Modifier
+                .padding(start = 15.dp, top = 24.dp)
+                .clickable {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        dataStore.saveLayout(!isLight)
+                    }
+                }
+                .size(75.dp),
+            painter = if (isLight) painterResource(id = R.drawable.sunicon)
+            else painterResource(id = R.drawable.moonicon),
+            contentDescription = if (isLight) "Icon Matahari" else "Icon Bulan"
+        )
     }
 }
 
@@ -307,30 +339,31 @@ fun Buku(dataBuku: DataBuku, onClick: () -> Unit) {
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
-            Text(
-                modifier = Modifier
-                    .padding(top = 10.dp, bottom = 5.dp)
-                    .height(90.dp)
-                    .width(100.dp),
-                text = dataBuku.deskripsi,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-//                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                modifier = Modifier
-                    .padding(5.dp),
-                text = dataBuku.pengarang,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White,
-            )
+            Row(
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp).fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                IconButton(
+                    modifier = Modifier.size(17.dp),
+                    onClick = { /*TODO*/ }) {
+                    Icon(
+                        modifier = Modifier.size(16.dp),
+                        painter = painterResource(id = R.drawable.unfavorite),
+                        contentDescription = "Bukan favorite",
+                        tint = Color.White
+                    )
+                }
+                Text(
+                    text = dataBuku.pengarang,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                )
+            }
         }
     }
 }
@@ -343,10 +376,10 @@ fun Buku(dataBuku: DataBuku, onClick: () -> Unit) {
 //    }
 //}
 
-//@Preview(showBackground = true)
-//@Composable
-//fun MainPrev() {
-//    DaunDiaryTheme {
-//        MainScreen(rememberNavController())
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun MainPrev() {
+    DaunDiaryTheme {
+        MainScreen(rememberNavController())
+    }
+}
