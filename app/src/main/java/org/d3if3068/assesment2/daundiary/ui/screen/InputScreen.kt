@@ -59,6 +59,7 @@ import org.d3if3068.assesment2.daundiary.R
 import org.d3if3068.assesment2.daundiary.database.BukuDb
 import org.d3if3068.assesment2.daundiary.model.InputViewModel
 import org.d3if3068.assesment2.daundiary.model.Warna
+import org.d3if3068.assesment2.daundiary.navigation.Screen
 import org.d3if3068.assesment2.daundiary.ui.theme.Coklat
 import org.d3if3068.assesment2.daundiary.ui.theme.CoklatTua
 import org.d3if3068.assesment2.daundiary.ui.theme.DarkPrimary
@@ -136,7 +137,7 @@ val itemWarna = listOf(
     ),
 )
 
-const val KEY_ID_BUKU = "idBuku"
+//const val KEY_ID_BUKU = "idBuku"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -152,6 +153,7 @@ fun InputScreen(navController: NavHostController, id: Int? = null) {
     var judul by remember { mutableStateOf("") }
     var deskripsi by remember { mutableStateOf("") }
     var pengarang by remember { mutableStateOf("") }
+    var isi by remember { mutableStateOf("") }
     var warnaBuku by remember { mutableStateOf(Color.Unspecified) }
 
     var showDialog by remember {
@@ -193,20 +195,18 @@ fun InputScreen(navController: NavHostController, id: Int? = null) {
                         )
                     }
                 },
-                actions = {
-                    if (id != null) {
-                        MenuDelete {
-                            showDialog = true
-                        }
-                        KonfirmasiHapus(
-                            openDialog = showDialog,
-                            onDismissRequest = { showDialog = false }) {
-                            showDialog = false
-                            viewModel.delete(id)
-                            navController.popBackStack()
-                        }
-                    }
-                }
+//                actions = {
+//                    if (id != null) {
+//                        Menu(update = {showDialog = true}, delete = {showDialog = true})
+//                        KonfirmasiHapus(
+//                            openDialog = showDialog,
+//                            onDismissRequest = { showDialog = false }) {
+//                            showDialog = false
+//                            viewModel.delete(id)
+//                            navController.popBackStack()
+//                        }
+//                    }
+//                }
             )
         },
     ) { padding ->
@@ -219,6 +219,8 @@ fun InputScreen(navController: NavHostController, id: Int? = null) {
             onAuthorChange = { pengarang = it },
             dataWarna = warnaBuku,
             onColorChange = { warnaBuku = it },
+            isi = isi,
+            onIsiChange = {isi = it},
             modifier = Modifier.padding(padding),
             contextnya = context,
             idNya = id,
@@ -235,6 +237,7 @@ fun InputContent(
     dataDeskripsi: String, onDescChange: (String) -> Unit,
     dataPengarang: String, onAuthorChange: (String) -> Unit,
     dataWarna: Color, onColorChange: (Color) -> Unit,
+    isi: String, onIsiChange: (String) -> Unit,
     modifier: Modifier,
     contextnya: Context,
     idNya: Int?,
@@ -299,21 +302,25 @@ fun InputContent(
                 .padding(top = 13.dp)
                 .width(267.dp),
             onClick = {
-                if (dataJudul == "" || dataDeskripsi == "" || dataPengarang == "" || dataWarna.hashCode() == 16) {
-                    Toast.makeText(contextnya, "Invalid", Toast.LENGTH_LONG).show()
-                    return@Button
-                }
+                if (idNya != null)
+                      navController.navigate(Screen.InputIsi.withId(idNya))
 
-                if (idNya == null) {
-                    viewModel.insert(dataJudul, dataDeskripsi, dataPengarang, dataWarna, tanggalBuat, tanggalEdit)
-                } else {
-                    viewModel.update(idNya, dataJudul, dataDeskripsi, dataPengarang, dataWarna, tanggalBuat, tanggalEdit)
-                }
-                navController.popBackStack()
+
+//                if (dataJudul == "" || dataDeskripsi == "" || dataPengarang == "" || dataWarna.hashCode() == 16) {
+//                    Toast.makeText(contextnya, "Invalid", Toast.LENGTH_LONG).show()
+//                    return@Button
+//                }
+//
+//                if (idNya == null) {
+//                    viewModel.insert(dataJudul, dataDeskripsi, dataPengarang, dataWarna, tanggalBuat, tanggalEdit, isi)
+//                } else {
+//                    viewModel.update(idNya, dataJudul, dataDeskripsi, dataPengarang, dataWarna, tanggalBuat, tanggalEdit, isi)
+//                }
+//                navController.popBackStack()
             },
             colors = ButtonDefaults.buttonColors(if (isLight) LightPrimary else DarkPrimary)
         ) {
-            Text(text = stringResource(R.string.simpan), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Lanjutkan", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -347,7 +354,7 @@ fun BukuInput(
         ) {
             TextField(
                 value = judul,
-                onValueChange = { perubahanJudul(it) },
+                onValueChange = { perubahanJudul(it.take(28)) },
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .width(160.dp)
@@ -368,7 +375,7 @@ fun BukuInput(
             )
             TextField(
                 value = deskripsi,
-                onValueChange = { perubahanDeskrips(it) },
+                onValueChange = { perubahanDeskrips(it.take(110)) },
                 modifier = Modifier
                     .padding(16.dp)
                     .width(160.dp)
@@ -389,7 +396,7 @@ fun BukuInput(
             )
             TextField(
                 value = pengarang,
-                onValueChange = { perubahanPengarang(it) },
+                onValueChange = { perubahanPengarang(it.take(20)) },
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .width(160.dp)
@@ -408,32 +415,6 @@ fun BukuInput(
                     unfocusedIndicatorColor = Color.Transparent
                 )
             )
-        }
-    }
-}
-
-@Composable
-fun MenuDelete(delete: () -> Unit) {
-    var expended by remember {
-        mutableStateOf(false)
-    }
-
-    IconButton(onClick = { expended = true }) {
-        Icon(
-            imageVector = Icons.Filled.MoreVert,
-            contentDescription = stringResource(R.string.lainnya),
-            tint = Color.White
-        )
-        DropdownMenu(
-            expanded = expended,
-            onDismissRequest = { expended = false })
-        {
-            DropdownMenuItem(
-                text = { Text(text = stringResource(R.string.hapus)) },
-                onClick = {
-                    expended = false
-                    delete()
-                })
         }
     }
 }

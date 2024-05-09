@@ -259,7 +259,7 @@ fun ScreenContent(
                             }
                             itemsIndexed(data) { _, item ->
                                 Buku(item) {
-                                    navController.navigate(Screen.FormUbah.withId(item.id))
+                                    navController.navigate(Screen.Detail.withId(item.id))
                                 }
                             }
                             item {

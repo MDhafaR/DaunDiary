@@ -8,14 +8,15 @@ import kotlinx.coroutines.launch
 import org.d3if3068.assesment2.daundiary.database.BukuDao
 
 class InputViewModel(private val dao: BukuDao) : ViewModel() {
-    fun insert(judul: String, deskripsi: String, pengarang:String, warnaBuku: Color, tanggalBuat: Long, tanggalEdit: Long) {
+    fun insert(judul: String, deskripsi: String, pengarang:String, warnaBuku: Color, tanggalBuat: Long, tanggalEdit: Long, isi: String) {
         val buku = DataBuku(
             judul = judul,
             deskripsi = deskripsi,
             pengarang = pengarang,
             warnaBuku = warnaBuku.hashCode(),
             tanggalBuat = tanggalBuat,
-            tanggalDiUbah = tanggalEdit
+            tanggalDiUbah = tanggalEdit,
+            isi = isi
         )
         viewModelScope.launch(Dispatchers.IO) {
             dao.insert(buku)
@@ -26,7 +27,7 @@ class InputViewModel(private val dao: BukuDao) : ViewModel() {
         return dao.getBookById(id)
     }
 
-    fun update(id: Int, judul: String, deskripsi: String, pengarang: String, warnaBuku: Color,tanggalBuat: Long, tanggalEdit: Long) {
+    fun update(id: Int, judul: String, deskripsi: String, pengarang: String, warnaBuku: Color,tanggalBuat: Long, tanggalEdit: Long, isi: String) {
         val buku = DataBuku(
             id,
             judul,
@@ -34,7 +35,8 @@ class InputViewModel(private val dao: BukuDao) : ViewModel() {
             pengarang,
             warnaBuku.hashCode(),
             tanggalBuat,
-            tanggalEdit
+            tanggalEdit,
+            isi
         )
         viewModelScope.launch(Dispatchers.IO) {
             dao.update(buku)
