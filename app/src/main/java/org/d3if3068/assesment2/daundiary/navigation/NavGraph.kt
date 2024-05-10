@@ -1,22 +1,17 @@
 package org.d3if3068.assesment2.daundiary.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import org.d3if3068.assesment2.daundiary.database.BukuDb
 import org.d3if3068.assesment2.daundiary.ui.screen.DetailScreen
 import org.d3if3068.assesment2.daundiary.ui.screen.InputScreen
 import org.d3if3068.assesment2.daundiary.ui.screen.IsiBuku
 import org.d3if3068.assesment2.daundiary.ui.screen.KEY_ID_BUKU
 import org.d3if3068.assesment2.daundiary.ui.screen.MainScreen
-import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
 
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {

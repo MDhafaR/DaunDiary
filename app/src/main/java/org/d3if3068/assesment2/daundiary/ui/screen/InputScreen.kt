@@ -56,7 +56,6 @@ import org.d3if3068.assesment2.daundiary.R
 import org.d3if3068.assesment2.daundiary.database.BukuDb
 import org.d3if3068.assesment2.daundiary.model.InputViewModel
 import org.d3if3068.assesment2.daundiary.model.Warna
-import org.d3if3068.assesment2.daundiary.navigation.Screen
 import org.d3if3068.assesment2.daundiary.ui.theme.Coklat
 import org.d3if3068.assesment2.daundiary.ui.theme.CoklatTua
 import org.d3if3068.assesment2.daundiary.ui.theme.DarkPrimary
@@ -155,10 +154,6 @@ fun InputScreen(
     var pengarang by remember { mutableStateOf("") }
     var isi by remember { mutableStateOf("") }
     var warnaBuku by remember { mutableStateOf(Color.Unspecified) }
-
-    var showDialog by remember {
-        mutableStateOf(false)
-    }
 
     LaunchedEffect(true) {
         if (id == null) return@LaunchedEffect

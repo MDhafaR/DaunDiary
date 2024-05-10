@@ -55,15 +55,15 @@ class InputViewModel(private val dao: BukuDao) : ViewModel() {
         }
     }
 
-    fun lihatIsiBuku(id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            dao.lihatIsiById(id)
-        }
-    }
-
     fun updateIsi(isi: String, id: Int){
         viewModelScope.launch(Dispatchers.IO) {
             dao.updateIsi(isi, id)
         }
     }
+
+//    fun uodateFavorite(isFavorite: Boolean, id: Int){
+//        viewModelScope.launch(Dispatchers.IO) {
+//            dao.updateFavorite(isFavorite, id)
+//        }
+//    }
 }

@@ -3,7 +3,6 @@ package org.d3if3068.assesment2.daundiary.ui.screen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -192,19 +191,19 @@ fun ScreenContent(
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy((-16).dp, Alignment.End)
                     ) {
-                        IconButton(
-                            modifier = Modifier
-                                .padding(top = 23.dp, start = 8.dp, end = 8.dp)
-                                .size(40.dp),
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(
-                                modifier = Modifier
-                                    .size(30.dp),
-                                painter = painterResource(id = R.drawable.bookfav),
-                                contentDescription = "buku favorit"
-                            )
-                        }
+//                        IconButton(
+//                            modifier = Modifier
+//                                .padding(top = 23.dp, start = 8.dp, end = 8.dp)
+//                                .size(40.dp),
+//                            onClick = {  }
+//                        ) {
+//                            Icon(
+//                                modifier = Modifier
+//                                    .size(30.dp),
+//                                painter = painterResource(id = R.drawable.bookfav),
+//                                contentDescription = "buku favorit"
+//                            )
+//                        }
                         TextField(
                             shape = RoundedCornerShape(17.dp),
                             leadingIcon = {
@@ -315,6 +314,11 @@ fun TampilanDataKosong() {
 
 @Composable
 fun Buku(dataBuku: DataBuku, onClick: () -> Unit) {
+//    val context = LocalContext.current
+//    val db = BukuDb.getInstance(context)
+//    val factory = ViewModelFactory(db.dao)
+//    val viewModel: InputViewModel = viewModel(factory = factory)
+
     val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()) }
     Box(
         modifier = Modifier
@@ -348,20 +352,29 @@ fun Buku(dataBuku: DataBuku, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis
             )
             Row(
-                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp).fillMaxSize(),
+                modifier = Modifier
+                    .padding(start = 8.dp, bottom = 8.dp)
+                    .fillMaxSize(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom
             ) {
-                IconButton(
-                    modifier = Modifier.size(17.dp),
-                    onClick = {  }) {
-                    Icon(
-                        modifier = Modifier.size(16.dp),
-                        painter = painterResource(id = R.drawable.unfavorite),
-                        contentDescription = "Bukan favorite",
-                        tint = Color.White
-                    )
-                }
+//                IconButton(
+//                    modifier = Modifier.size(17.dp),
+//                    onClick = {
+//                        if (!dataBuku.favorite) {
+//                            viewModel.uodateFavorite(true, dataBuku.id)
+//                        } else {
+//                            viewModel.uodateFavorite(false, dataBuku.id)
+//                        }
+//                    }) {
+//                    Icon(
+//                        modifier = Modifier.size(16.dp),
+//                        painter = if (dataBuku.favorite) painterResource(id = R.drawable.favorite)
+//                        else painterResource( id = R.drawable.unfavorite),
+//                        contentDescription = "Bukan favorite",
+//                        tint = Color.White
+//                    )
+//                }
                 Text(
                     text = dateFormat.format(dataBuku.tanggalBuat),
                     fontSize = 11.sp,

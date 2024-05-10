@@ -24,9 +24,6 @@ interface BukuDao {
     @Query("DELETE FROM book WHERE id = :id")
     suspend fun deleteById(id: Int)
 
-    @Query("SELECT isi FROM book WHERE id = :id")
-    fun lihatIsiById(id: Int): Flow<List<String>>
-
     @Query("SELECT * FROM book WHERE judul LIKE '%' || :searchQuery || '%' ORDER BY judul ASC")
     fun searchBooksByTitle(searchQuery: String): Flow<List<DataBuku>>
 
@@ -35,4 +32,10 @@ interface BukuDao {
 
     @Query("UPDATE book set isi = :isiNya WHERE id = :id")
     suspend fun updateIsi(isiNya: String, id: Int)
+
+    @Query("UPDATE book set favorite = :isFavorite WHERE id = :id")
+    suspend fun updateFavorite(isFavorite: Boolean, id: Int)
+
+//    @Query("SELECT * FROM book WHERE favorite = 1 ORDER BY judul ASC")
+//    fun getFavoriteBooks(): Flow<List<DataBuku>>
 }
