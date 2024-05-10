@@ -17,13 +17,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -71,7 +68,6 @@ import org.d3if3068.assesment2.daundiary.ui.theme.Orange
 import org.d3if3068.assesment2.daundiary.ui.theme.PinkMuda
 import org.d3if3068.assesment2.daundiary.util.SettingsDataStore
 import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
-import org.d3if3068.assesment2.daundiary.widgets.KonfirmasiHapus
 import org.d3if3068.assesment2.daundiary.widgets.PilihanWarna
 
 val itemWarna = listOf(
@@ -137,11 +133,15 @@ val itemWarna = listOf(
     ),
 )
 
-//const val KEY_ID_BUKU = "idBuku"
+//const val KEY_ID_BUKU_BARU = "idBukuBaru"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputScreen(navController: NavHostController, id: Int? = null) {
+fun InputScreen(
+    onNavigateToScreen: (String, String, String, Int) -> Unit,
+    navController: NavHostController,
+    id: Int? = null
+) {
     val dataStore = SettingsDataStore(LocalContext.current)
     val isLight by dataStore.layoutFlow.collectAsState(initial = true)
 
@@ -220,13 +220,14 @@ fun InputScreen(navController: NavHostController, id: Int? = null) {
             dataWarna = warnaBuku,
             onColorChange = { warnaBuku = it },
             isi = isi,
-            onIsiChange = {isi = it},
+            onIsiChange = { isi = it },
             modifier = Modifier.padding(padding),
             contextnya = context,
             idNya = id,
             viewModel = viewModel,
             navController = navController,
-            isLight
+            isLight,
+            onNavigateToScreen
         )
     }
 }
@@ -243,11 +244,9 @@ fun InputContent(
     idNya: Int?,
     viewModel: InputViewModel,
     navController: NavHostController,
-    isLight: Boolean
+    isLight: Boolean,
+    onNavigateScreen: (String, String, String, Int) -> Unit
 ) {
-    val tanggalBuat : Long = System.currentTimeMillis()
-    val tanggalEdit : Long = System.currentTimeMillis()
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -297,30 +296,45 @@ fun InputContent(
             color = if (isLight) LightPrimary else DarkPrimary,
             thickness = 1.dp
         )
-        Button(
-            modifier = Modifier
-                .padding(top = 13.dp)
-                .width(267.dp),
-            onClick = {
-                if (idNya != null)
-                      navController.navigate(Screen.InputIsi.withId(idNya))
+        if (idNya == null) {
+            Button(
+                modifier = Modifier
+                    .padding(top = 13.dp)
+                    .width(267.dp),
+                onClick = {
+                    if (dataJudul == "" || dataDeskripsi == "" || dataPengarang == "" || dataWarna.hashCode() == 16) {
+                        Toast.makeText(contextnya, "Invalid", Toast.LENGTH_LONG).show()
+                        return@Button
+                    }
 
+                    onNavigateScreen(dataJudul, dataDeskripsi, dataPengarang, dataWarna.hashCode())
 
-//                if (dataJudul == "" || dataDeskripsi == "" || dataPengarang == "" || dataWarna.hashCode() == 16) {
-//                    Toast.makeText(contextnya, "Invalid", Toast.LENGTH_LONG).show()
-//                    return@Button
-//                }
 //
-//                if (idNya == null) {
-//                    viewModel.insert(dataJudul, dataDeskripsi, dataPengarang, dataWarna, tanggalBuat, tanggalEdit, isi)
-//                } else {
-//                    viewModel.update(idNya, dataJudul, dataDeskripsi, dataPengarang, dataWarna, tanggalBuat, tanggalEdit, isi)
-//                }
 //                navController.popBackStack()
-            },
-            colors = ButtonDefaults.buttonColors(if (isLight) LightPrimary else DarkPrimary)
-        ) {
-            Text(text = "Lanjutkan", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                },
+                colors = ButtonDefaults.buttonColors(if (isLight) LightPrimary else DarkPrimary)
+            ) {
+                Text(text = "Lanjutkan", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            }
+        } else {
+            Button(
+                modifier = Modifier
+                    .padding(top = 13.dp)
+                    .width(267.dp),
+                onClick = {
+                    if (dataJudul == "" || dataDeskripsi == "" || dataPengarang == "" || dataWarna.hashCode() == 16) {
+                        Toast.makeText(contextnya, "Invalid", Toast.LENGTH_LONG).show()
+                        return@Button
+                    }
+                    val tanggalSaatIni: Long = System.currentTimeMillis()
+
+                    viewModel.updateCover(dataJudul, dataDeskripsi, dataPengarang, dataWarna.hashCode(),tanggalSaatIni, idNya)
+                navController.popBackStack()
+                },
+                colors = ButtonDefaults.buttonColors(if (isLight) LightPrimary else DarkPrimary)
+            ) {
+                Text(text = "Simpan", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
@@ -423,6 +437,8 @@ fun BukuInput(
 @Composable
 fun InputPrev() {
     DaunDiaryTheme {
-        InputScreen(rememberNavController())
+        InputScreen(onNavigateToScreen = { judul, deskripsi, pengarang, warna ->
+            println("Judul: $judul, Deskripsi: $deskripsi, Pengarang: $pengarang")
+        }, rememberNavController())
     }
 }

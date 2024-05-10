@@ -26,4 +26,7 @@ interface BukuDao {
 
     @Query("SELECT * FROM book WHERE judul LIKE '%' || :searchQuery || '%' ORDER BY judul ASC")
     fun searchBooksByTitle(searchQuery: String): Flow<List<DataBuku>>
+
+    @Query("UPDATE book set judul = :judul, deskripsi = :deskripsi, pengarang = :pengarang, warnaBuku = :warna, tanggalDiUbah = :tanggalUpdate WHERE id = :id")
+    suspend fun updateCover(judul: String, deskripsi:String, pengarang: String, warna: Int, tanggalUpdate: Long, id: Int)
 }

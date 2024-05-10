@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,12 +53,15 @@ import androidx.navigation.compose.rememberNavController
 import org.d3if3068.assesment2.daundiary.R
 import org.d3if3068.assesment2.daundiary.database.BukuDb
 import org.d3if3068.assesment2.daundiary.model.InputViewModel
+import org.d3if3068.assesment2.daundiary.navigation.Screen
 import org.d3if3068.assesment2.daundiary.ui.theme.DarkPrimary
 import org.d3if3068.assesment2.daundiary.ui.theme.DaunDiaryTheme
 import org.d3if3068.assesment2.daundiary.ui.theme.LightPrimary
 import org.d3if3068.assesment2.daundiary.util.SettingsDataStore
 import org.d3if3068.assesment2.daundiary.util.ViewModelFactory
 import org.d3if3068.assesment2.daundiary.widgets.KonfirmasiHapus
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 const val KEY_ID_BUKU = "idBuku"
 
@@ -75,6 +79,8 @@ fun DetailScreen(navController: NavHostController, id: Int? = null) {
     var judul by remember { mutableStateOf("") }
     var deskripsi by remember { mutableStateOf("") }
     var pengarang by remember { mutableStateOf("") }
+    var tanngalBuat by remember { mutableLongStateOf(0) }
+    var tanngalEdit by remember { mutableLongStateOf(0) }
     var warnaBuku by remember { mutableStateOf(Color.Unspecified) }
 
     LaunchedEffect(true) {
@@ -84,6 +90,8 @@ fun DetailScreen(navController: NavHostController, id: Int? = null) {
         deskripsi = data.deskripsi
         pengarang = data.pengarang
         warnaBuku = Color(data.warnaBuku)
+        tanngalBuat = data.tanggalBuat
+        tanngalEdit = data.tanggalDiUbah
     }
 
     Scaffold(
@@ -120,6 +128,8 @@ fun DetailScreen(navController: NavHostController, id: Int? = null) {
             dataDeskripsi = deskripsi,
             dataPengarang = pengarang,
             dataWarna = warnaBuku,
+            tanggalBuat = tanngalBuat,
+            tanggalEdit = tanngalEdit,
             modifier = Modifier.padding(padding),
             idNya = id,
             viewModel = viewModel,
@@ -135,14 +145,15 @@ fun DetailContent(
     dataDeskripsi: String,
     dataPengarang: String,
     dataWarna: Color,
+    tanggalBuat: Long,
+    tanggalEdit: Long,
     modifier: Modifier,
     idNya: Int?,
     viewModel: InputViewModel,
     navController: NavHostController,
     isLight: Boolean
 ) {
-    val tanggalBuat: Long = System.currentTimeMillis()
-    val tanggalEdit: Long = System.currentTimeMillis()
+    val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -183,7 +194,7 @@ fun DetailContent(
         ) {
             Text(text = "dibuat pada tanggal", fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
             Spacer(modifier = Modifier.width(33.dp))
-            Text(text = ": 28-10-2024", fontWeight = FontWeight.Medium, fontSize = 20.sp)
+            Text(text = ": ${dateFormat.format(tanggalBuat)}", fontWeight = FontWeight.Medium, fontSize = 20.sp)
         }
         Row(
             modifier = Modifier
@@ -196,7 +207,7 @@ fun DetailContent(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp
             )
-            Text(text = " 28-10-2024", fontWeight = FontWeight.Medium, fontSize = 20.sp)
+            Text(text = " ${dateFormat.format(tanggalEdit)}", fontWeight = FontWeight.Medium, fontSize = 20.sp)
         }
     }
 }
@@ -242,7 +253,7 @@ fun TampilanBuku(
                         .size(33.dp)
                 ) {
                     if (id != null) {
-                        Menu(update = { showDialog = true }, delete = { showDialog = true })
+                        Menu(update = { navController.navigate(Screen.FormUbah.withId(id)) }, delete = { showDialog = true })
                         KonfirmasiHapus(
                             openDialog = showDialog,
                             onDismissRequest = { showDialog = false }) {

@@ -48,4 +48,10 @@ class InputViewModel(private val dao: BukuDao) : ViewModel() {
             dao.deleteById(id)
         }
     }
+
+    fun updateCover(judul: String, deskripsi: String, pengarang: String, warnaBuku: Int,tanggalEdit: Long, id: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.updateCover(judul, deskripsi, pengarang, warnaBuku,tanggalEdit,  id)
+        }
+    }
 }
