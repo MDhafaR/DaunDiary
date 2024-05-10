@@ -24,9 +24,15 @@ interface BukuDao {
     @Query("DELETE FROM book WHERE id = :id")
     suspend fun deleteById(id: Int)
 
+    @Query("SELECT isi FROM book WHERE id = :id")
+    fun lihatIsiById(id: Int): Flow<List<String>>
+
     @Query("SELECT * FROM book WHERE judul LIKE '%' || :searchQuery || '%' ORDER BY judul ASC")
     fun searchBooksByTitle(searchQuery: String): Flow<List<DataBuku>>
 
     @Query("UPDATE book set judul = :judul, deskripsi = :deskripsi, pengarang = :pengarang, warnaBuku = :warna, tanggalDiUbah = :tanggalUpdate WHERE id = :id")
     suspend fun updateCover(judul: String, deskripsi:String, pengarang: String, warna: Int, tanggalUpdate: Long, id: Int)
+
+    @Query("UPDATE book set isi = :isiNya WHERE id = :id")
+    suspend fun updateIsi(isiNya: String, id: Int)
 }

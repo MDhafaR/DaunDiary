@@ -176,7 +176,9 @@ fun DetailContent(
                 .padding(top = 58.dp)
                 .width(267.dp),
             onClick = {
-
+                if (idNya != null) {
+                    navController.navigate(Screen.IsiScreen.withId(idNya))
+                }
             },
             colors = ButtonDefaults.buttonColors(if (isLight) LightPrimary else DarkPrimary)
         ) {

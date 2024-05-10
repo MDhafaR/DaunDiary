@@ -13,7 +13,8 @@ data class DataBuku(
     val warnaBuku: Int,
     val tanggalBuat: Long,
     val tanggalDiUbah: Long,
-    val isi: String
+    val isi: String,
+    val favorite: Boolean = false
 )
 
 //object DataDummy {

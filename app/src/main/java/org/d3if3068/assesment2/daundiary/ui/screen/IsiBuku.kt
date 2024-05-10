@@ -85,6 +85,10 @@ fun IsiBuku(
 
     var isi by remember { mutableStateOf("") }
 
+    var edit by remember {
+        mutableStateOf(false)
+    }
+
     val tanggalSaatIni: Long = System.currentTimeMillis()
 
     LaunchedEffect(true) {
@@ -122,32 +126,70 @@ fun IsiBuku(
                     }
                 },
                 actions = {
-                    IconButton(
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(40.dp),
-                        onClick = {
-                            if (id == null) {
-                    viewModel.insert(
-                        judul,
-                        deskripsi,
-                        pengarang,
-                        Color(warna),
-                        tanggalSaatIni,
-                        tanggalSaatIni,
-                        isi
-                    )
-                } else {
+                    if (id == null) {
+                        IconButton(
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(40.dp),
+                            onClick = {
 
-                }
-                            navController.popBackStack(navController.graph.startDestinationId, false)
-                        }) {
-                        Icon(
-                            modifier = Modifier.size(35.dp),
-                            tint = Color.White,
-                            painter = painterResource(id = R.drawable.saved),
-                            contentDescription = "save Isi"
-                        )
+                                viewModel.insert(
+                                    judul,
+                                    deskripsi,
+                                    pengarang,
+                                    Color(warna),
+                                    tanggalSaatIni,
+                                    tanggalSaatIni,
+                                    isi
+                                )
+                                navController.popBackStack(
+                                    navController.graph.startDestinationId,
+                                    false
+                                )
+                            }) {
+                            Icon(
+                                modifier = Modifier.size(35.dp),
+                                tint = Color.White,
+                                painter = painterResource(id = R.drawable.saved),
+                                contentDescription = "save Isi"
+                            )
+                        }
+                    } else if (edit) {
+                        IconButton(
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(40.dp),
+                            onClick = {
+
+                                viewModel.updateIsi(isi, id)
+                                navController.popBackStack(
+                                    navController.graph.startDestinationId,
+                                    false
+                                )
+                            }) {
+                            Icon(
+                                modifier = Modifier.size(35.dp),
+                                tint = Color.White,
+                                painter = painterResource(id = R.drawable.saved),
+                                contentDescription = "save Isi"
+                            )
+                        }
+                    }
+                    else {
+                        IconButton(
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(40.dp),
+                            onClick = {
+                                    edit = true
+                            }) {
+                            Icon(
+                                modifier = Modifier.size(35.dp),
+                                tint = Color.White,
+                                painter = painterResource(id = R.drawable.edited),
+                                contentDescription = "edit isi"
+                            )
+                        }
                     }
                 }
             )
@@ -157,9 +199,8 @@ fun IsiBuku(
             modifier = Modifier.padding(padding),
             dataIsi = isi,
             onIsiChange = { isi = it },
-            judul = judul,
-            deskripsi = deskripsi,
-            pengarang = pengarang
+            id = id,
+            edited = edit
         )
     }
 }
@@ -169,28 +210,37 @@ fun IsiContent(
     modifier: Modifier,
     dataIsi: String,
     onIsiChange: (String) -> Unit,
-    judul: String,
-    deskripsi: String,
-    pengarang: String
+    id: Int?,
+    edited : Boolean
 ) {
-    OutlinedTextField(
-        value = dataIsi,
-        onValueChange = { onIsiChange(it) },
-        modifier = modifier
-            .padding(top = 16.dp)
-            .fillMaxSize(),
-        textStyle = TextStyle(
+    if (id == null || edited) {
+        OutlinedTextField(
+            value = dataIsi,
+            onValueChange = { onIsiChange(it) },
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black
+            ),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White,
+            )
+        )
+    } else {
+        Text(
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize(),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color.Black
-        ),
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color.White,
-            focusedContainerColor = Color.White,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            color = Color.Black,
+            text = dataIsi
         )
-    )
+    }
 
 }
 

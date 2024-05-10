@@ -85,7 +85,30 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
             val deskripsi = backStackEntry.arguments?.getString("deskripsi") ?: ""
             val pengarang = backStackEntry.arguments?.getString("pengarang") ?: ""
             val warna = backStackEntry.arguments?.getInt("warna") ?: 0
-            IsiBuku(judul = judul, deskripsi = deskripsi, pengarang = pengarang,warna = warna, navController = navController)
+            IsiBuku(
+                judul = judul,
+                deskripsi = deskripsi,
+                pengarang = pengarang,
+                warna = warna,
+                navController = navController
+            )
+        }
+
+        composable(
+            route = Screen.IsiScreen.route,
+            arguments = listOf(
+                navArgument(KEY_ID_BUKU) { type = NavType.IntType },
+            )
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getInt(KEY_ID_BUKU)
+            IsiBuku(
+                judul = "",
+                deskripsi = "",
+                pengarang = "",
+                warna = 0,
+                navController = navController,
+                id
+            )
         }
     }
 }

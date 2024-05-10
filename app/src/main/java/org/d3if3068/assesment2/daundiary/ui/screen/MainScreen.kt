@@ -3,6 +3,7 @@ package org.d3if3068.assesment2.daundiary.ui.screen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -353,7 +354,7 @@ fun Buku(dataBuku: DataBuku, onClick: () -> Unit) {
             ) {
                 IconButton(
                     modifier = Modifier.size(17.dp),
-                    onClick = { /*TODO*/ }) {
+                    onClick = {  }) {
                     Icon(
                         modifier = Modifier.size(16.dp),
                         painter = painterResource(id = R.drawable.unfavorite),

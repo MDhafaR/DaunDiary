@@ -54,4 +54,16 @@ class InputViewModel(private val dao: BukuDao) : ViewModel() {
             dao.updateCover(judul, deskripsi, pengarang, warnaBuku,tanggalEdit,  id)
         }
     }
+
+    fun lihatIsiBuku(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.lihatIsiById(id)
+        }
+    }
+
+    fun updateIsi(isi: String, id: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.updateIsi(isi, id)
+        }
+    }
 }
